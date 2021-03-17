@@ -1,16 +1,26 @@
 import pygame
-import numpy as np
 import time
-import copy
 import math
-import argparse
 from matplotlib import pyplot as plt
-from matplotlib.animation import FuncAnimation
 
 
-def obstacleOrNot(node):
-    x = node[0]
-    y = node[1]
+
+def obstacleOrNot(point):
+    """
+        Check whether the point is inside or outside the
+        defined obstacles.
+
+        Note: The obstacles have been defined using half 
+        plane method
+
+
+        Input: point/testCase(tuple)
+
+        Return: Boolean(True or False)
+
+    """
+    x = point[0]
+    y = point[1]
     #circle
     if((x-90)**2 + (y-70)**2 - 35**2 < 0): #circle
         return False
@@ -34,14 +44,40 @@ def obstacleOrNot(node):
     else:
         return True
 
-
 class DjikstraQueue:
+    """
+    Class created to implement queue for Djikstra
+
+    Maintains a list of nodes with another list
+    maintaining the cost of each node.
+
+    """
+
     def __init__(self, node):
+        """
+        Initialize a DjikstraQueue object corresponding to a
+        start point.
+
+        Input: node(tuple)
+
+        Return:
+
+        """
         self.queue = [node]
         self.cost = {node:0}
         self.child_parent_rel = {node:(0,0)}
 
     def insert(self, node, new_node, cost):
+        """
+        Insert an element in the queue and also store its
+        cost incase the current cost is greater than new 
+        cost
+
+        Input: self, node(tuple), new_node(tuple), cost(float)
+
+        Returns: None
+
+        """
         self.queue.append(new_node)
 
         if (new_node not in self.child_parent_rel) or self.child_parent_rel[new_node][1] > cost:
@@ -49,24 +85,44 @@ class DjikstraQueue:
             self.cost[new_node] = cost
         
     def extract(self):
+        """
+        Pop a point which has the minimum cost
+        from the queue.
+
+        Input: None
+
+        Returns: The node with the minimum
+        cost(tuple)
+
+        """
         key_of_minimum_cost = min(self.cost, key=self.cost.get)
         self.cost.pop(key_of_minimum_cost)
         self.queue.remove(key_of_minimum_cost)
         return key_of_minimum_cost
 
 
-
-
-
-
-
-
-
 class MovePoint:
+    """
+    Class that is used to do decide point moving opeartion
+    and processing which includes generating possible moves for the
+    point.
 
-    def __init__(self, startPoint, goalPoint, size,algo):
+    """
+
+    def __init__(self, startPoint, goalPoint, size):
+        """
+        Initialize the MovePoint object corresponding to a
+        start point, goal point, size of arena and the algorithm 
+        to use.
+        
+
+        Input: startPoint(tuple), endPoint(tuple),
+        size(tuple), algo(str)
+
+        Return: None
+
+        """
         self.goalPoint = goalPoint
-        self.algo = algo
 
         self.queue = DjikstraQueue(startPoint)
 
@@ -74,20 +130,28 @@ class MovePoint:
         self.visited = {startPoint:0}
         self.cost = {startPoint:0}
         
-        
     
-    def nodeOperation(self, node, moveCost, *args, **kwargs):
+    def nodeOperation(self, node, moveCost, x, y, *args):
+        """
+        Generate the next node based on the operation and
+        the node
+
+        Input: node/point(tuple), moveCost(float),
+        *args(list), **kwargs(dict)
+
+        Return: True/False(Bool)
+        """
+        
         newNode = False
-        obj = list(kwargs.keys())
-        if(len(obj) == 1):
-            if(obj[0] == "x"):
-                if(obstacleOrNot(node) and node[0] != kwargs["x"]):
-                    newNode = (node[0]+args[0],node[1]+args[1])
-            else:
-                if(obstacleOrNot(node) and node[1] != kwargs["y"]):
-                    newNode = (node[0]+args[0],node[1]+args[1])
+
+        if(y == "None"):
+            if(obstacleOrNot(node) and node[0] != x):
+                newNode = (node[0]+args[0],node[1]+args[1])
+        elif(x == "None"):
+            if(obstacleOrNot(node) and node[1] != y):
+                newNode = (node[0]+args[0],node[1]+args[1])
         else:
-            if(obstacleOrNot(node) and node[0] != kwargs["x"] and node[1] != kwargs["y"]):
+            if(obstacleOrNot(node) and node[0] != x and node[1] != y):
                 newNode = (node[0]+args[0],node[1]+args[1])
 
 
@@ -104,6 +168,15 @@ class MovePoint:
        
 
     def pointProcessor(self):
+        """
+        Process the point moving operation and check if the
+        goal node is achived or not.
+
+        Input: self
+
+        Return: True/False(Bool)
+
+        """
         queue = self.queue
 
         size = self.size
@@ -114,43 +187,37 @@ class MovePoint:
             return True
         node= queue.extract()
         
-        #left
-        self.nodeOperation(node,1,-1,0,x=0)
+        operationParams = [[1, 0, "None", -1, 0], #left
+                            [1, size[0], "None", 1, 0], #right
+                            [1, "None", 0, 0, -1], #down
+                            [1, "None", size[1], 0, 1], #top
+                            [math.sqrt(2), 0, 0, -1, -1], #bottomLeft
+                            [math.sqrt(2), 0, size[1], -1, 1], #topLeft
+                            [math.sqrt(2), size[0], 0, 1, -1], #bottomRight
+                            [math.sqrt(2), size[0], size[1], 1, 1]] #topRight
         
-        #right
-        self.nodeOperation(node,1,1,0,x=size[0])
-
-        #down
-        self.nodeOperation(node,1,0,-1,y=0)
-
-        #top
-        self.nodeOperation(node,1,0,1,y=size[1])
-
-        #bottomLeft
-        self.nodeOperation(node,math.sqrt(2),-1,-1,x=0,y=0)
-
-        
-        #topLeft
-        self.nodeOperation(node,math.sqrt(2),-1,1,x=0,y=size[1])
-        
-
-        #bottomRight
-        self.nodeOperation(node,math.sqrt(2),1,-1,x=size[0],y=0)
-
-        #topRight
-        self.nodeOperation(node,math.sqrt(2),1,1,x=size[0],y=size[1])
+        for param in operationParams:
+            self.nodeOperation(node, param[0],param[1],param[2],param[3],param[4])
 
         return False
 
     def backTrace(self,startPoint):
+        """
+        Back trace the path from goal point to start point
+
+        Input: self,startPoint(tuple)
+
+        Return: backTraceArr(list)
+
+        """
         goalPoint = self.goalPoint
 
-        visited = self.queue.child_parent_rel
+        child_parent_relation = self.queue.child_parent_rel
         backTraceArr = []
         
         node = goalPoint
         while(node != startPoint):
-            node = visited[node][0]
+            node = child_parent_relation[node][0]
             backTraceArr.append(node)
         return backTraceArr
 
@@ -161,39 +228,58 @@ def to_pygame(coords):
     return (coords[0], 300 - coords[1])
 
 def main():
+    print("\n")
+    print(r"""    ____        __  __       ____  __                           
+   / __ \____ _/ /_/ /_     / __ \/ /___ _____  ____  ___  _____
+  / /_/ / __ `/ __/ __ \   / /_/ / / __ `/ __ \/ __ \/ _ \/ ___/
+ / ____/ /_/ / /_/ / / /  / ____/ / /_/ / / / / / / /  __/ /    
+/_/    \__,_/\__/_/ /_/  /_/   /_/\__,_/_/ /_/_/ /_/\___/_/     
+                                                                
+""")
+    
+    x1 = int(input("\nEnter the x coordinate of the start point: "))
+    y1 = int(input("Enter the y coordinate of the start point: "))
+
+    x2 = int(input("Enter the x coordinate of the goal point: "))
+    y2 = int(input("Enter the y coordinate of the goal point: "))
+    print("\n")
+    
     start = time.time()
-    startPoint = (0,0)
-    endPoint = (212,266)
+    startPoint = (x1,y1)
+    endPoint = (x2,y2)
     arenaSize = (400,300)
 
-    if((not obstacleOrNot(startPoint)) or (startPoint[0] > arenaSize[0]) or (startPoint[1] > arenaSize[0])):
+    if((not obstacleOrNot(startPoint)) or (startPoint[0] > arenaSize[0]) or (startPoint[1] > arenaSize[1])):
         outStr = "Error: Start Point either on/inside obstacle or outside specified arena"
         print("#"*len(outStr))
         print("\n"+outStr+"\n")
         print("#"*len(outStr))
+        print("\n")
         return False
-    if((not obstacleOrNot(endPoint)) or (endPoint[0] > arenaSize[0]) or (endPoint[1] > arenaSize[0])):
+    if((not obstacleOrNot(endPoint)) or (endPoint[0] > arenaSize[0]) or (endPoint[1] > arenaSize[1])):
         outStr = "Error: Goal either on/inside obstacle or outside specified arena"
         print("#"*len(outStr))
         print("\n"+outStr+"\n")
         print("#"*len(outStr))
+        print("\n")
         return False
 
-    algo = "q"
-    move = MovePoint(startPoint,endPoint,arenaSize,algo)  
+    
+
+    move = MovePoint(startPoint,endPoint,arenaSize)  
     flag = False
-    count = 0
     while(not flag):
-        count += 1
         flag = move.pointProcessor()
     
     end = time.time()
-    print(end-start)
-    print(count)
+    finalOut = f"\nPath found in {round(end - start, 4)} seconds.\n"
+    print(finalOut)
     
     backTraceArr = move.backTrace(startPoint)
     
     pygame.init()
+
+    pygame.display.set_caption("Path Planner")
 
     white = (255,255,255)
     black = (0,0,0)
@@ -228,26 +314,22 @@ def main():
     
     while True:
         pygame.event.get()
-
         
         pygame.draw.circle(gameDisplay, black, to_pygame(endPoint),2)
         for key in move.visited.keys():
             pygame.draw.circle(gameDisplay, blue, to_pygame(key),1)
-            clock.tick(1000000)
+            clock.tick(10000000)
             pygame.display.update()
 
         for point in backTraceArr:
             pygame.draw.circle(gameDisplay, green, to_pygame(point),1)
-            clock.tick(200)
+            clock.tick(150)
             pygame.display.update()
 
         
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                quit()
         
-        time.sleep(5)
+        
+        time.sleep(3)
         pygame.quit()
         
         
