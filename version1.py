@@ -22,7 +22,7 @@ def obstacleOrNot(point):
     x = point[0]
     y = point[1]
     #circle
-    if((x-90)**2 + (y-70)**2 - 35**2 < 0): #circle
+    if((x-90)**2 + (y-70)**2 - 50**2 < 0): #circle
         return False
     
     # tilted Rectangle
@@ -30,17 +30,13 @@ def obstacleOrNot(point):
         return False
     
     # C shaped Polygon
-    elif((x >= 200 and x <= 210 and y <= 280 and y >=230 ) or (x>= 210 and x <= 230 and y >=270 and y <= 280) or (y >= 230 and y <= 240 and x >= 210 and x <= 230)):
+    elif((x >= 185 and x <= 225 and y <= 295 and y >=215 ) or (x>= 225 and x <= 245 and y >=255 and y <= 295) or (y >= 215 and y <= 255 and x >= 225 and x <= 245)):
         return False
     
     # ellipse
-    elif((((x-246)/60))**2 + (((y-145)/30))**2 - 1 < 0):
+    elif((((x-246)/75))**2 + (((y-145)/45))**2 - 1 < 0):
         return False
     
-    # crooked polygon
-    elif(((x-y-265<=0) and (x+y-391>=0) and (5*x+5*y-2351<=0) and (50*x-50*y-9007>=0)) or ((5*x+5*y-2351>=0) and (703*x+2883*y-646716<0) and (x+y-492<=0) and (x-y-265<=0)) or ((x+y-492>=0) and (x-y-265<=0) and (x<=381.03) and (1101*x-901*y-265416>0))):#                   (x<381.03) and (1101*x-901*y-265416>0) and (703*x+2883*y-646716<0) and (50*x-50*y-9007>0) and ):
-        return False
-
     else:
         return True
 
@@ -304,11 +300,6 @@ def main():
     polygon = [(200,230),(230,230),(230,240),(210,240),(210,270),(230,270),(230,280),(200,280)]
     newPolygon = [to_pygame(x) for x in polygon]
     pygame.draw.polygon(gameDisplay, red, newPolygon)
-
-    polygon1 = [(328,63),(381.03,116.03),(381.03,171.03),(354,138),(327.17,145.03),(285.57,105.43)]
-    newPolygon1 = [to_pygame(x) for x in polygon1]
-    pygame.draw.polygon(gameDisplay, red, newPolygon1)
-
 
     clock = pygame.time.Clock()
     
