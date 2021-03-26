@@ -26,7 +26,19 @@ def obstacleOrNot(point):
         return False
     
     # tilted Rectangle
-    elif((8604*x - 12287*y + 914004 < 0) and (81900*x +59350*y-25510527 < 0) and (86036*x - 122870*y + 12140167 > 0) and (8192*x + 5735*y - 1012596 > 0)):
+    # elif((8604*x - 12287*y + 914004 < 0) and (81900*x +59350*y-25510527 < 0) and (86036*x - 122870*y + 12140167 > 0) and (8192*x + 5735*y - 1012596 > 0)):
+    #     return False
+    
+    # l1 = y - 0.7*x - 74.4
+    l1 = y - 0.7*x - 56.09
+    # l2 = y + 1.43*x - 176.64
+    l2 = y + 1.43*x - 140.19
+    # l3 = y - 0.7*x - 98.8
+    l3 = y - 0.7*x - 117.11
+    # l4 = y + 1.43*x - 438.37
+    l4 = y + 1.43*x - 474.82
+    
+    if l1>0 and l2>0 and l3<0 and l4<0:
         return False
     
     # C shaped Polygon
@@ -288,15 +300,29 @@ def main():
 
     gameDisplay = pygame.display.set_mode((400,300))
     gameDisplay.fill(white)
+    rect_cl = [(46.77,101.02),(177.81,192.745),(160.615,217.33),(29.58,125.604)]
+    newCoords = [to_pygame(x) for x in rect_cl]
+    pygame.draw.polygon(gameDisplay, green, newCoords)
+    
     rect = [(48,108),(170.87,194.04),(159.40,210.42),(36.53,124.383)]
     newCoords = [to_pygame(x) for x in rect]
     pygame.draw.polygon(gameDisplay, red, newCoords)
 
+    pygame.draw.circle(gameDisplay, green, to_pygame((90,70)),40)
     pygame.draw.circle(gameDisplay, red, to_pygame((90,70)),35)
+    
+    ellipseCenter = to_pygame((181,180))
+    ellipse = (ellipseCenter[0],ellipseCenter[1],130,70)
+    pygame.draw.ellipse(gameDisplay, green, ellipse)
+    
     ellipseCenter = to_pygame((186,175))
-    ellipse = (ellipseCenter[0],ellipseCenter[1],120,60)
-    pygame.draw.ellipse(gameDisplay, red, ellipse)
+    ellipse_cl = (ellipseCenter[0],ellipseCenter[1],120,60)
+    pygame.draw.ellipse(gameDisplay, red, ellipse_cl)
 
+    polygon = [(195,225),(235,225),(235,245),(215,245),(215,265),(235,265),(235,285),(195,285)]
+    newPolygon = [to_pygame(x) for x in polygon]
+    pygame.draw.polygon(gameDisplay, green, newPolygon)
+    
     polygon = [(200,230),(230,230),(230,240),(210,240),(210,270),(230,270),(230,280),(200,280)]
     newPolygon = [to_pygame(x) for x in polygon]
     pygame.draw.polygon(gameDisplay, red, newPolygon)
@@ -313,7 +339,7 @@ def main():
             pygame.display.update()
 
         for point in backTraceArr:
-            pygame.draw.circle(gameDisplay, green, to_pygame(point),1)
+            pygame.draw.circle(gameDisplay, yellow, to_pygame(point),1)
             clock.tick(150)
             pygame.display.update()
 
