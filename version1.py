@@ -339,7 +339,7 @@ def main():
             pygame.display.update()
 
         for point in backTraceArr:
-            pygame.draw.circle(gameDisplay, yellow, to_pygame(point),1)
+            pygame.draw.circle(gameDisplay, yellow, to_pygame(point),10,1)
             clock.tick(150)
             pygame.display.update()
 
