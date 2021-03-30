@@ -9,15 +9,10 @@ def obstacleOrNot(point):
     """
         Check whether the point is inside or outside the
         defined obstacles.
-
         Note: The obstacles have been defined using half 
         plane method
-
-
         Input: point/testCase(tuple)
-
         Return: Boolean(True or False)
-
     """
     x = point[0]
     y = point[1]
@@ -55,21 +50,16 @@ def obstacleOrNot(point):
 class DjikstraQueue:
     """
     Class created to implement queue for Djikstra
-
     Maintains a list of nodes with another list
     maintaining the cost of each node.
-
     """
 
     def __init__(self, node):
         """
         Initialize a DjikstraQueue object corresponding to a
         start point.
-
         Input: node(tuple)
-
         Return:
-
         """
         self.queue = [node]
         self.cost = {node:0}
@@ -80,11 +70,8 @@ class DjikstraQueue:
         Insert an element in the queue and also store its
         cost incase the current cost is greater than new 
         cost
-
         Input: self, node(tuple), new_node(tuple), cost(float)
-
         Returns: None
-
         """
         self.queue.append(new_node)
 
@@ -96,12 +83,9 @@ class DjikstraQueue:
         """
         Pop a point which has the minimum cost
         from the queue.
-
         Input: None
-
         Returns: The node with the minimum
         cost(tuple)
-
         """
         key_of_minimum_cost = min(self.cost, key=self.cost.get)
         self.cost.pop(key_of_minimum_cost)
@@ -114,7 +98,6 @@ class MovePoint:
     Class that is used to do decide point moving opeartion
     and processing which includes generating possible moves for the
     point.
-
     """
 
     def __init__(self, startPoint, goalPoint, size):
@@ -123,12 +106,9 @@ class MovePoint:
         start point, goal point, size of arena and the algorithm 
         to use.
         
-
         Input: startPoint(tuple), endPoint(tuple),
         size(tuple), algo(str)
-
         Return: None
-
         """
         self.goalPoint = goalPoint
 
@@ -143,10 +123,8 @@ class MovePoint:
         """
         Generate the next node based on the operation and
         the node
-
         Input: node/point(tuple), moveCost(float),
         *args(list), **kwargs(dict)
-
         Return: True/False(Bool)
         """
         
@@ -179,11 +157,8 @@ class MovePoint:
         """
         Process the point moving operation and check if the
         goal node is achived or not.
-
         Input: self
-
         Return: True/False(Bool)
-
         """
         queue = self.queue
 
@@ -212,11 +187,8 @@ class MovePoint:
     def backTrace(self,startPoint):
         """
         Back trace the path from goal point to start point
-
         Input: self,startPoint(tuple)
-
         Return: backTraceArr(list)
-
         """
         goalPoint = self.goalPoint
 
@@ -369,12 +341,4 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-
-
-        
-
-
-
-
 
