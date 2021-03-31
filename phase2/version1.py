@@ -118,7 +118,7 @@ class MovePoint:
     point.
     """
 
-    def __init__(self, startPoint, goalPoint, size):
+    def __init__(self, startPoint, goalPoint, theta, size):
         """
         Initialize the MovePoint object corresponding to a
         start point, goal point, size of arena and the algorithm 
@@ -129,6 +129,7 @@ class MovePoint:
         Return: None
         """
         self.goalPoint = goalPoint
+        self.theta = theta
 
         self.queue = A_Star(startPoint,goalPoint)
 
@@ -281,7 +282,7 @@ def main():
 
     
 
-    move = MovePoint(startPoint,endPoint,arenaSize)  
+    move = MovePoint(startPoint,endPoint,theta,arenaSize)  
     flag = False
     while(not flag):
         flag = move.pointProcessor()
