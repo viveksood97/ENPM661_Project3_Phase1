@@ -47,16 +47,16 @@ def obstacleOrNot(point):
     else:
         return True
 
-class DjikstraQueue:
+class A_Star:
     """
     Class created to implement queue for Djikstra
     Maintains a list of nodes with another list
     maintaining the cost of each node.
     """
 
-    def __init__(self, node):
+    def __init__(self, node, goalPoint):
         """
-        Initialize a DjikstraQueue object corresponding to a
+        Initialize a A_Star object corresponding to a
         start point.
         Input: node(tuple)
         Return:
@@ -64,6 +64,23 @@ class DjikstraQueue:
         self.queue = [node]
         self.cost = {node:0}
         self.child_parent_rel = {node:(0,0)}
+        self.goalPoint = goalPoint
+
+
+    def euclideanDistance(self, node):
+        """
+        Generate a priority number for each node by the extent of
+        arrangement i.e., checking the distance from current node
+        to the goal node.
+
+        Input: self,testCase/node
+
+        Returns: Priority of the input node
+
+        """
+        
+        d = math.sqrt((node[0]-self.goalPoint[0])**2 + (node[1]-self.goalPoint[1])**2)
+        return d
 
     def insert(self, node, new_node, cost):
         """
@@ -76,6 +93,7 @@ class DjikstraQueue:
         self.queue.append(new_node)
 
         if (new_node not in self.child_parent_rel) or self.child_parent_rel[new_node][1] > cost:
+            cost += self.euclideanDistance(new_node)
             self.child_parent_rel[new_node] = [node, cost]
             self.cost[new_node] = cost
         
@@ -112,7 +130,7 @@ class MovePoint:
         """
         self.goalPoint = goalPoint
 
-        self.queue = DjikstraQueue(startPoint)
+        self.queue = A_Star(startPoint,goalPoint)
 
         self.size = size
         self.visited = {startPoint:0}
@@ -140,7 +158,12 @@ class MovePoint:
             if(obstacleOrNot(node) and node[0] != x and node[1] != y):
                 newNode = (node[0]+args[0],node[1]+args[1])
 
-
+        if(newNode and self.goalPoint == newNode):
+                self.visited[newNode] = 0
+                cost = self.cost[node] + moveCost
+                self.cost[newNode] = cost
+                self.queue.insert(node, newNode, cost)
+                return True
         
         if(newNode and newNode not in self.visited):
             self.visited[newNode] = 0
@@ -180,7 +203,9 @@ class MovePoint:
                             [math.sqrt(2), size[0], size[1], 1, 1]] #topRight
         
         for param in operationParams:
-            self.nodeOperation(node, param[0],param[1],param[2],param[3],param[4])
+            flag = self.nodeOperation(node, param[0],param[1],param[2],param[3],param[4])
+            if flag == True:
+                return True
 
         return False
 
