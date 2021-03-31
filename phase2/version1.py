@@ -247,11 +247,14 @@ def main():
 
     x2 = int(input("Enter the x coordinate of the goal point: "))
     y2 = int(input("Enter the y coordinate of the goal point: "))
+    
+    step_size = int(input("Enter the step size for movement between 1 and 10: "))
     print("\n")
     
     start = time.time()
     startPoint = (x1,y1)
     endPoint = (x2,y2)
+    theta = 30
     arenaSize = (400,300)
 
     if((not obstacleOrNot(startPoint)) or (startPoint[0] > arenaSize[0]) or (startPoint[1] > arenaSize[1])):
@@ -263,6 +266,13 @@ def main():
         return False
     if((not obstacleOrNot(endPoint)) or (endPoint[0] > arenaSize[0]) or (endPoint[1] > arenaSize[1])):
         outStr = "Error: Goal either on/inside obstacle or outside specified arena"
+        print("#"*len(outStr))
+        print("\n"+outStr+"\n")
+        print("#"*len(outStr))
+        print("\n")
+        return False
+    if( (step_size<1) or (step_size>10)):
+        outStr = "Error: Step Size is incorrect. Please enter step size between 1 and 10"
         print("#"*len(outStr))
         print("\n"+outStr+"\n")
         print("#"*len(outStr))
