@@ -310,11 +310,17 @@ def main():
             clock.tick(10000000)
             pygame.display.update()
 
-        for point in backTraceArr:
-            pygame.draw.circle(gameDisplay, yellow, to_pygame(point),10,1)
+        for point in range(len(backTraceArr)):
+            pygame.draw.circle(gameDisplay, yellow, to_pygame(backTraceArr[point]),10,2)
+            clock.tick(150)
+            pygame.display.update()
+            pygame.draw.circle(gameDisplay, blue, to_pygame(backTraceArr[point]),10,2)
             clock.tick(150)
             pygame.display.update()
 
+        for point in range(len(backTraceArr)):
+            pygame.draw.circle(gameDisplay, yellow, to_pygame(backTraceArr[point]),1)
+            pygame.display.update()
         
         
         
