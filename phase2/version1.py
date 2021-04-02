@@ -138,7 +138,7 @@ class MovePoint:
         self.cost = {startPoint:0}
         
     
-    def nodeOperation(self, node, moveCost, x, y, *args):
+    def nodeOperation(self, node, moveCost, *args):
         """
         Generate the next node based on the operation and
         the node
@@ -149,27 +149,36 @@ class MovePoint:
         
         newNode = False
 
-        if(y == "None"):
-            if(obstacleOrNot(node) and node[0] != x):
-                newNode = (node[0]+args[0],node[1]+args[1])
-        elif(x == "None"):
-            if(obstacleOrNot(node) and node[1] != y):
-                newNode = (node[0]+args[0],node[1]+args[1])
-        else:
-            if(obstacleOrNot(node) and node[0] != x and node[1] != y):
-                newNode = (node[0]+args[0],node[1]+args[1])
-
-        if(newNode and self.goalPoint == newNode):
+        # if(y == "None"):
+        #     if(obstacleOrNot(node) and node[0] != x):
+        #         newNode = (node[0]+args[0],node[1]+args[1])
+        # elif(x == "None"):
+        #     if(obstacleOrNot(node) and node[1] != y):
+        #         newNode = (node[0]+args[0],node[1]+args[1])
+        # else:
+        if(obstacleOrNot(node)):
+            newNode = (node[0]+int(moveCost*math.cos(self.theta + args[0])),node[1]+int(moveCost*math.sin(self.theta + args[0])))
+        
+        # if(newNode and self.goalPoint == newNode):
+        if(newNode and self.queue.euclideanDistance(newNode) < 1.5):
                 self.visited[newNode] = 0
                 cost = self.cost[node] + moveCost
                 self.cost[newNode] = cost
+                self.theta = self.theta + args[0]
                 self.queue.insert(node, newNode, cost)
+                
+                self.visited[self.goalPoint] = 0
+                cost = self.cost[newNode] + moveCost
+                self.cost[self.goalPoint] = cost
+                self.theta = self.theta % 360
+                self.queue.insert(newNode, self.goalPoint, cost)
                 return True
         
         if(newNode and newNode not in self.visited):
             self.visited[newNode] = 0
             cost = self.cost[node] + moveCost
             self.cost[newNode] = cost
+            self.theta = self.theta + args[0]
             self.queue.insert(node, newNode, cost)
             
         return False
@@ -177,7 +186,7 @@ class MovePoint:
 
        
 
-    def pointProcessor(self):
+    def pointProcessor(self, step_size):
         """
         Process the point moving operation and check if the
         goal node is achived or not.
@@ -194,17 +203,23 @@ class MovePoint:
             return True
         node= queue.extract()
         
-        operationParams = [[1, 0, "None", -1, 0], #left
-                            [1, size[0], "None", 1, 0], #right
-                            [1, "None", 0, 0, -1], #down
-                            [1, "None", size[1], 0, 1], #top
-                            [math.sqrt(2), 0, 0, -1, -1], #bottomLeft
-                            [math.sqrt(2), 0, size[1], -1, 1], #topLeft
-                            [math.sqrt(2), size[0], 0, 1, -1], #bottomRight
-                            [math.sqrt(2), size[0], size[1], 1, 1]] #topRight
+        # operationParams = [[1, 0, "None", -1, 0], #left
+        #                     [1, size[0], "None", 1, 0], #right
+        #                     [1, "None", 0, 0, -1], #down
+        #                     [1, "None", size[1], 0, 1], #top
+        #                     [math.sqrt(2), 0, 0, -1, -1], #bottomLeft
+        #                     [math.sqrt(2), 0, size[1], -1, 1], #topLeft
+        #                     [math.sqrt(2), size[0], 0, 1, -1], #bottomRight
+        #                     [math.sqrt(2), size[0], size[1], 1, 1]] #topRight
+        
+        operationParams = [[step_size, 30], 
+                            [step_size, 60], 
+                            [step_size, 0], 
+                            [step_size, -30], 
+                            [step_size, -60]] 
         
         for param in operationParams:
-            flag = self.nodeOperation(node, param[0],param[1],param[2],param[3],param[4])
+            flag = self.nodeOperation(node, param[0],param[1])
             if flag == True:
                 return True
 
@@ -285,7 +300,7 @@ def main():
     move = MovePoint(startPoint,endPoint,theta,arenaSize)  
     flag = False
     while(not flag):
-        flag = move.pointProcessor()
+        flag = move.pointProcessor(step_size)
     
     end = time.time()
     finalOut = f"\nPath found in {round(end - start, 4)} seconds.\n"
