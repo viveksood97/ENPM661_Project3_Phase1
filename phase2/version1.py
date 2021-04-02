@@ -158,20 +158,19 @@ class MovePoint:
         #         newNode = (node[0]+args[0],node[1]+args[1])
         # else:
         if(obstacleOrNot(node)):
-            newNode = (node[0]+int(moveCost*math.cos(self.theta + args[0])),node[1]+int(moveCost*math.sin(self.theta + args[0])))
-        
+            newNode = (node[0]+int(moveCost*math.cos(node[2] + args[0])),node[1]+int(moveCost*math.sin(node[2] + args[0])),(node[2] + args[0])%360)
         # if(newNode and self.goalPoint == newNode):
         if(newNode and self.queue.euclideanDistance(newNode) < 1.5):
                 self.visited[newNode] = 0
                 cost = self.cost[node] + moveCost
                 self.cost[newNode] = cost
-                self.theta = self.theta + args[0]
+                # self.theta = self.theta + args[0]
                 self.queue.insert(node, newNode, cost)
                 
                 self.visited[self.goalPoint] = 0
                 cost = self.cost[newNode] + moveCost
                 self.cost[self.goalPoint] = cost
-                self.theta = self.theta % 360
+                # self.theta = self.theta % 360
                 self.queue.insert(newNode, self.goalPoint, cost)
                 return True
         
@@ -179,7 +178,7 @@ class MovePoint:
             self.visited[newNode] = 0
             cost = self.cost[node] + moveCost
             self.cost[newNode] = cost
-            self.theta = self.theta + args[0]
+            # self.theta = self.theta + args[0]
             self.queue.insert(node, newNode, cost)
             
         return False
@@ -270,9 +269,9 @@ def main():
     print("\n")
     
     start = time.time()
-    startPoint = (x1,y1)
-    endPoint = (x2,y2)
     theta = 30
+    startPoint = (x1,y1,theta)
+    endPoint = (x2,y2)
     arenaSize = (400,300)
 
     if((not obstacleOrNot(startPoint)) or (startPoint[0] > arenaSize[0]) or (startPoint[1] > arenaSize[1])):
@@ -310,6 +309,8 @@ def main():
     
     backTraceArr = move.backTrace(startPoint)
     
+    #-------------------------------------------------------------------------------#
+    
     f_map = np.zeros(shape = (arenaSize[1],arenaSize[0],3))
     
     # Plot the map
@@ -325,11 +326,13 @@ def main():
     # Q = px.quiver(np.array(backTraceArr[0][0]),np.array(backTraceArr[0][1]),np.array(3),np.array(-1),units='xy' ,scale=1)
     px.imshow(f_map.astype('uint8'), animated=True)
     for i in backTraceArr:
-        px.quiver(np.array(i[0]),np.array(i[1]),np.array(3),np.array(-1),units='xy' , color='r')
+        px.quiver(np.array(i[0]),np.array(i[1]),np.cos(i[2]),np.sin(i[2]),units='xy' , color='r')
     
     # im = plt.imshow(f_map.astype('uint8'), animated=True)
     # ani = animation.FuncAnimation(fig,animate, interval=0)
     plt.show()
+    
+    #-------------------------------------------------------------------------------#
     
     # pygame.init()
 
