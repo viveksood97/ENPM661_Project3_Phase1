@@ -2,6 +2,7 @@ import pygame
 import time
 import math
 from matplotlib import pyplot as plt
+import numpy as np
 
 
 
@@ -203,15 +204,6 @@ class MovePoint:
             return True
         node= queue.extract()
         
-        # operationParams = [[1, 0, "None", -1, 0], #left
-        #                     [1, size[0], "None", 1, 0], #right
-        #                     [1, "None", 0, 0, -1], #down
-        #                     [1, "None", size[1], 0, 1], #top
-        #                     [math.sqrt(2), 0, 0, -1, -1], #bottomLeft
-        #                     [math.sqrt(2), 0, size[1], -1, 1], #topLeft
-        #                     [math.sqrt(2), size[0], 0, 1, -1], #bottomRight
-        #                     [math.sqrt(2), size[0], size[1], 1, 1]] #topRight
-        
         operationParams = [[step_size, 30], 
                             [step_size, 60], 
                             [step_size, 0], 
@@ -247,6 +239,16 @@ class MovePoint:
 def to_pygame(coords):
     """Convert coordinates into pygame coordinates (lower-left => top left)."""
     return (coords[0], 300 - coords[1])
+
+def animate(*args):
+    '''
+    Animates the process of searching and finding
+    
+    input: Point coordinate
+    output: Boolean, True if point is in circle
+    '''
+    
+    return im
 
 def main():
     print("\n")
@@ -308,69 +310,90 @@ def main():
     
     backTraceArr = move.backTrace(startPoint)
     
-    pygame.init()
-
-    pygame.display.set_caption("Path Planner")
-
-    white = (255,255,255)
-    black = (0,0,0)
+    f_map = np.zeros(shape = (arenaSize[1],arenaSize[0],3))
     
-    yellow = (255,255,0)
-    red = (255,0,0)
-    green = (0,255,0)
-    blue = (0,0,255,10)
+    # Plot the map
+    for i in range(arenaSize[0]):
+        for j in range(arenaSize[1]):
+            if not obstacleOrNot([i,j]):
+                f_map[j][i] = [255,255,0]
+                
+    # Initialise the plotting figure            
+    fig,px = plt.subplots(1,1)
+    plt.xlim(0, 400)
+    plt.ylim(0, 300)
+    # Q = px.quiver(np.array(backTraceArr[0][0]),np.array(backTraceArr[0][1]),np.array(3),np.array(-1),units='xy' ,scale=1)
+    px.imshow(f_map.astype('uint8'), animated=True)
+    for i in backTraceArr:
+        px.quiver(np.array(i[0]),np.array(i[1]),np.array(3),np.array(-1),units='xy' , color='r')
+    
+    # im = plt.imshow(f_map.astype('uint8'), animated=True)
+    # ani = animation.FuncAnimation(fig,animate, interval=0)
+    plt.show()
+    
+    # pygame.init()
+
+    # pygame.display.set_caption("Path Planner")
+
+    # white = (255,255,255)
+    # black = (0,0,0)
+    
+    # yellow = (255,255,0)
+    # red = (255,0,0)
+    # green = (0,255,0)
+    # blue = (0,0,255,10)
 
 
-    gameDisplay = pygame.display.set_mode((400,300))
-    gameDisplay.fill(white)
-    rect_cl = [(46.77,101.02),(177.81,192.745),(160.615,217.33),(29.58,125.604)]
-    newCoords = [to_pygame(x) for x in rect_cl]
-    pygame.draw.polygon(gameDisplay, green, newCoords)
+    # gameDisplay = pygame.display.set_mode((400,300))
+    # gameDisplay.fill(white)
+    # rect_cl = [(46.77,101.02),(177.81,192.745),(160.615,217.33),(29.58,125.604)]
+    # newCoords = [to_pygame(x) for x in rect_cl]
+    # pygame.draw.polygon(gameDisplay, green, newCoords)
     
-    rect = [(48,108),(170.87,194.04),(159.40,210.42),(36.53,124.383)]
-    newCoords = [to_pygame(x) for x in rect]
-    pygame.draw.polygon(gameDisplay, red, newCoords)
+    # rect = [(48,108),(170.87,194.04),(159.40,210.42),(36.53,124.383)]
+    # newCoords = [to_pygame(x) for x in rect]
+    # pygame.draw.polygon(gameDisplay, red, newCoords)
 
-    pygame.draw.circle(gameDisplay, green, to_pygame((90,70)),40)
-    pygame.draw.circle(gameDisplay, red, to_pygame((90,70)),35)
+    # pygame.draw.circle(gameDisplay, green, to_pygame((90,70)),40)
+    # pygame.draw.circle(gameDisplay, red, to_pygame((90,70)),35)
     
-    ellipseCenter = to_pygame((181,180))
-    ellipse = (ellipseCenter[0],ellipseCenter[1],130,70)
-    pygame.draw.ellipse(gameDisplay, green, ellipse)
+    # ellipseCenter = to_pygame((181,180))
+    # ellipse = (ellipseCenter[0],ellipseCenter[1],130,70)
+    # pygame.draw.ellipse(gameDisplay, green, ellipse)
     
-    ellipseCenter = to_pygame((186,175))
-    ellipse_cl = (ellipseCenter[0],ellipseCenter[1],120,60)
-    pygame.draw.ellipse(gameDisplay, red, ellipse_cl)
+    # ellipseCenter = to_pygame((186,175))
+    # ellipse_cl = (ellipseCenter[0],ellipseCenter[1],120,60)
+    # pygame.draw.ellipse(gameDisplay, red, ellipse_cl)
 
-    polygon = [(195,225),(235,225),(235,245),(215,245),(215,265),(235,265),(235,285),(195,285)]
-    newPolygon = [to_pygame(x) for x in polygon]
-    pygame.draw.polygon(gameDisplay, green, newPolygon)
+    # polygon = [(195,225),(235,225),(235,245),(215,245),(215,265),(235,265),(235,285),(195,285)]
+    # newPolygon = [to_pygame(x) for x in polygon]
+    # pygame.draw.polygon(gameDisplay, green, newPolygon)
     
-    polygon = [(200,230),(230,230),(230,240),(210,240),(210,270),(230,270),(230,280),(200,280)]
-    newPolygon = [to_pygame(x) for x in polygon]
-    pygame.draw.polygon(gameDisplay, red, newPolygon)
+    # polygon = [(200,230),(230,230),(230,240),(210,240),(210,270),(230,270),(230,280),(200,280)]
+    # newPolygon = [to_pygame(x) for x in polygon]
+    # pygame.draw.polygon(gameDisplay, red, newPolygon)
 
-    clock = pygame.time.Clock()
+    # clock = pygame.time.Clock()
     
-    while True:
-        pygame.event.get()
+    # while True:
+    #     pygame.event.get()
         
-        pygame.draw.circle(gameDisplay, black, to_pygame(endPoint),2)
-        for key in move.visited.keys():
-            pygame.draw.circle(gameDisplay, blue, to_pygame(key),1)
-            clock.tick(10000000)
-            pygame.display.update()
+    #     pygame.draw.circle(gameDisplay, black, to_pygame(endPoint),2)
+    #     for key in move.visited.keys():
+    #         pygame.draw.circle(gameDisplay, blue, to_pygame(key),1)
+    #         clock.tick(10000000)
+    #         pygame.display.update()
 
-        for point in backTraceArr:
-            pygame.draw.circle(gameDisplay, yellow, to_pygame(point),10,1)
-            clock.tick(150)
-            pygame.display.update()
+    #     for point in backTraceArr:
+    #         pygame.draw.circle(gameDisplay, yellow, to_pygame(point),10,1)
+    #         clock.tick(150)
+    #         pygame.display.update()
 
         
         
         
-        time.sleep(3)
-        pygame.quit()
+    #     time.sleep(3)
+    #     pygame.quit()
         
         
         # xpts = []
@@ -382,7 +405,7 @@ def main():
         #                 ypts.append(y)
         # plt.scatter(xpts,ypts,s=0.1)
         # plt.show()
-        quit()
+        # quit()
     
     
 
