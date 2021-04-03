@@ -202,7 +202,9 @@ class MovePoint:
         #print(node)
 
         if(queue.euclideanDistance(node)<1.5):
-            self.queue.child_parent_rel[goalPoint] = node
+            # print("node",node)
+            # print(self.queue.child_parent_rel[(node)])
+            self.queue.child_parent_rel[(goalPoint)] = node
             return True
         degrees = [-60,-30,0,30,60]
         #degrees = [-180,-90,0,90,180]
@@ -229,14 +231,19 @@ class MovePoint:
         
         
         node =  child_parent_relation[goalPoint]
+        # print("node",node)
         while(node != startPoint):
             node = child_parent_relation[node][0]
             backTraceArr.append(node)
-        return backTraceArr
+        return backTraceArr, child_parent_relation, self.theta
 
 def to_pygame(coords):
     """Convert coordinates into pygame coordinates (lower-left => top left)."""
     return (coords[0], 300 - coords[1])
+
+def triangle(gameDisplay,colour,start,end,angle):
+    base = (int(end[0] + math.cos(-angle)),int(end[0] + math.sin(-angle)))
+    pygame.draw.circle(gameDisplay, colour, to_pygame(base),2)
 
 def main():
     print("\n")
@@ -284,7 +291,7 @@ def main():
     while(not flag):
         flag = move.pointProcessor()
     
-    backTraceArr = move.backTrace(startPoint)
+    backTraceArr, child_parent_rel, theta = move.backTrace(startPoint)
     end = time.time()
     finalOut = f"\nPath found in {round(end - start, 4)} seconds.\n"
     print(finalOut)
@@ -339,25 +346,18 @@ def main():
         
         pygame.draw.circle(gameDisplay, black, to_pygame(endPoint),2)
         for key in move.visited.keys():
-            pygame.draw.circle(gameDisplay, blue, to_pygame(key),1)
+            if child_parent_rel[key][0]:
+                pygame.draw.line(gameDisplay,blue,to_pygame(key),to_pygame(child_parent_rel[key][0]))
             clock.tick(10000000)
             pygame.display.update()
-
-        for point in range(len(backTraceArr)):
-            pygame.draw.circle(gameDisplay, yellow, to_pygame(backTraceArr[point]),10,2)
-            clock.tick(150)
-            pygame.display.update()
-            pygame.draw.circle(gameDisplay, blue, to_pygame(backTraceArr[point]),10,2)
-            clock.tick(150)
-            pygame.display.update()
-
-        for point in range(len(backTraceArr)):
-            pygame.draw.circle(gameDisplay, yellow, to_pygame(backTraceArr[point]),1)
+        backTraceArr = backTraceArr[::-1]
+        for point in range(len(backTraceArr)-1):
+            pygame.draw.line(gameDisplay, yellow, to_pygame(backTraceArr[point]),to_pygame(backTraceArr[point+1]))
+            # triangle(gameDisplay,black,backTraceArr[point],backTraceArr[point+1],theta[backTraceArr[point]])
+            clock.tick(10000000)
             pygame.display.update()
         
-        
-        
-        time.sleep(3)
+        time.sleep(10)
         pygame.quit()
 
 if __name__ == '__main__':
