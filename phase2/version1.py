@@ -1,6 +1,7 @@
 import pygame
 import time
 import math
+import numpy as np
 from matplotlib import pyplot as plt
 
 def obstacleOrNot(point):
@@ -172,7 +173,7 @@ class MovePoint:
 
         if(obstacleOrNot(node)):
             new_theta = self.theta[node] + theta
-            newNode = (int(node[0]+(step_size*math.cos(new_theta))), int(node[1]+(step_size*math.sin(new_theta))))
+            newNode = (int(np.ceil(node[0]+(step_size*math.cos(new_theta)))), int(np.ceil(node[1]+(step_size*math.sin(new_theta)))))
             #print(newNode)
 
         
