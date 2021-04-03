@@ -202,6 +202,7 @@ class MovePoint:
         #print(node)
 
         if(queue.euclideanDistance(node)<1.5):
+            self.queue.child_parent_rel[goalPoint] = node
             return True
         degrees = [-60,-30,0,30,60]
         #degrees = [-180,-90,0,90,180]
@@ -214,6 +215,29 @@ class MovePoint:
         # print("#######")
         return False 
         
+    def backTrace(self,startPoint):
+        """
+        Back trace the path from goal point to start point
+        Input: self,startPoint(tuple)
+        Return: backTraceArr(list)
+        """
+        goalPoint = self.goalPoint
+
+        child_parent_relation = self.queue.child_parent_rel
+        backTraceArr = []
+
+        
+        
+        node =  child_parent_relation[goalPoint]
+        while(node != startPoint):
+            node = child_parent_relation[node][0]
+            backTraceArr.append(node)
+        return backTraceArr
+
+def to_pygame(coords):
+    """Convert coordinates into pygame coordinates (lower-left => top left)."""
+    return (coords[0], 300 - coords[1])
+
 def main():
     print("\n")
     print(r"""    ____        __  __       ____  __                           
@@ -260,10 +284,81 @@ def main():
     while(not flag):
         flag = move.pointProcessor()
     
+    backTraceArr = move.backTrace(startPoint)
     end = time.time()
     finalOut = f"\nPath found in {round(end - start, 4)} seconds.\n"
     print(finalOut)
+    print(backTraceArr)
     
+    pygame.init()
+
+    pygame.display.set_caption("Path Planner")
+
+    white = (255,255,255)
+    black = (0,0,0)
+    
+    yellow = (255,255,0)
+    red = (255,0,0)
+    green = (0,255,0)
+    blue = (0,0,255,10)
+
+
+    gameDisplay = pygame.display.set_mode((400,300))
+    gameDisplay.fill(white)
+    rect_cl = [(46.77,101.02),(177.81,192.745),(160.615,217.33),(29.58,125.604)]
+    newCoords = [to_pygame(x) for x in rect_cl]
+    pygame.draw.polygon(gameDisplay, green, newCoords)
+    
+    rect = [(48,108),(170.87,194.04),(159.40,210.42),(36.53,124.383)]
+    newCoords = [to_pygame(x) for x in rect]
+    pygame.draw.polygon(gameDisplay, red, newCoords)
+
+    pygame.draw.circle(gameDisplay, green, to_pygame((90,70)),40)
+    pygame.draw.circle(gameDisplay, red, to_pygame((90,70)),35)
+    
+    ellipseCenter = to_pygame((181,180))
+    ellipse = (ellipseCenter[0],ellipseCenter[1],130,70)
+    pygame.draw.ellipse(gameDisplay, green, ellipse)
+    
+    ellipseCenter = to_pygame((186,175))
+    ellipse_cl = (ellipseCenter[0],ellipseCenter[1],120,60)
+    pygame.draw.ellipse(gameDisplay, red, ellipse_cl)
+
+    polygon = [(195,225),(235,225),(235,245),(215,245),(215,265),(235,265),(235,285),(195,285)]
+    newPolygon = [to_pygame(x) for x in polygon]
+    pygame.draw.polygon(gameDisplay, green, newPolygon)
+    
+    polygon = [(200,230),(230,230),(230,240),(210,240),(210,270),(230,270),(230,280),(200,280)]
+    newPolygon = [to_pygame(x) for x in polygon]
+    pygame.draw.polygon(gameDisplay, red, newPolygon)
+
+    clock = pygame.time.Clock()
+    
+    while True:
+        pygame.event.get()
+        
+        pygame.draw.circle(gameDisplay, black, to_pygame(endPoint),2)
+        for key in move.visited.keys():
+            pygame.draw.circle(gameDisplay, blue, to_pygame(key),1)
+            clock.tick(10000000)
+            pygame.display.update()
+
+        for point in range(len(backTraceArr)):
+            pygame.draw.circle(gameDisplay, yellow, to_pygame(backTraceArr[point]),10,2)
+            clock.tick(150)
+            pygame.display.update()
+            pygame.draw.circle(gameDisplay, blue, to_pygame(backTraceArr[point]),10,2)
+            clock.tick(150)
+            pygame.display.update()
+
+        for point in range(len(backTraceArr)):
+            pygame.draw.circle(gameDisplay, yellow, to_pygame(backTraceArr[point]),1)
+            pygame.display.update()
+        
+        
+        
+        time.sleep(3)
+        pygame.quit()
 
 if __name__ == '__main__':
     # xpts = []
