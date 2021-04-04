@@ -295,7 +295,6 @@ def main():
     end = time.time()
     finalOut = f"\nPath found in {round(end - start, 4)} seconds.\n"
     print(finalOut)
-    print(backTraceArr)
     
     pygame.init()
 
