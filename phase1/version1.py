@@ -255,7 +255,7 @@ def main():
     finalOut = f"\nPath found in {round(end - start, 4)} seconds.\n"
     print(finalOut)
     
-    backTraceArr = move.backTrace(startPoint)
+    backTraceArr = move.backTrace(startPoint)[::-1]
     
     pygame.init()
 
