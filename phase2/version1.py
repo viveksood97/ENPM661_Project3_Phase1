@@ -202,9 +202,8 @@ class MovePoint:
         #print(node)
 
         if(queue.euclideanDistance(node)<1.5):
-            # print("node",node)
-            # print(self.queue.child_parent_rel[(node)])
-            self.queue.child_parent_rel[(goalPoint)] = node
+            if (goalPoint != node):
+                self.queue.child_parent_rel[goalPoint] = [node,0]
             return True
         degrees = [-60,-30,0,30,60]
         #degrees = [-180,-90,0,90,180]
@@ -230,9 +229,10 @@ class MovePoint:
 
         
         
-        node =  child_parent_relation[goalPoint]
-        # print("node",node)
+        node =  child_parent_relation[goalPoint][0]
         while(node != startPoint):
+            # print(child_parent_relation)
+            # print(node)
             node = child_parent_relation[node][0]
             backTraceArr.append(node)
         return backTraceArr, child_parent_relation, self.theta
