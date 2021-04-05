@@ -242,8 +242,14 @@ def to_pygame(coords):
     return (coords[0], 300 - coords[1])
 
 def triangle(gameDisplay,colour,start,end,angle):
-    base = (int(end[0] + math.cos(-angle)),int(end[0] + math.sin(-angle)))
-    pygame.draw.circle(gameDisplay, colour, to_pygame(base),2)
+    # base = (int(end[0] + math.cos(-angle)),int(end[0] + math.sin(-angle)))
+    # pygame.draw.circle(gameDisplay, colour, to_pygame(base),2)
+    rotation = angle+90
+    t1 = to_pygame((end[0]+3*math.sin(math.radians(rotation)), end[1]+3*math.cos(math.radians(rotation))))
+    t2 = to_pygame((end[0]+3*math.sin(math.radians(rotation-120)), end[1]+3*math.cos(math.radians(rotation-120))))
+    t3 = to_pygame((end[0]+3*math.sin(math.radians(rotation+120)),end[1]+3*math.cos(math.radians(rotation+120))))
+    pygame.draw.polygon(gameDisplay, colour, (t1, t2, t3))
+
 
 def main():
     print("\n")
@@ -351,8 +357,8 @@ def main():
             pygame.display.update()
         backTraceArr = backTraceArr[::-1]
         for point in range(len(backTraceArr)-1):
-            pygame.draw.line(gameDisplay, yellow, to_pygame(backTraceArr[point]),to_pygame(backTraceArr[point+1]))
-            # triangle(gameDisplay,black,backTraceArr[point],backTraceArr[point+1],theta[backTraceArr[point]])
+            pygame.draw.line(gameDisplay, black, to_pygame(backTraceArr[point]),to_pygame(backTraceArr[point+1]))
+            triangle(gameDisplay,black,backTraceArr[point],backTraceArr[point+1],theta[backTraceArr[point]])
             clock.tick(10000000)
             pygame.display.update()
         
