@@ -289,7 +289,7 @@ def main():
         print("#"*len(outStr))
         print("\n")
         return False
-    if(0<step_size<11):
+    if((0>step_size) or (step_size>10)):
         outStr = "Error: Incorrect step size."
         print("#"*len(outStr))
         print("\n"+outStr+"\n")
