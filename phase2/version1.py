@@ -7,7 +7,7 @@ from matplotlib import pyplot as plt
 def obstacleOrNot(point):
     """
         Check whether the point is inside or outside the
-        defined obstacles.
+        defined obstacles and clearance.
         Note: The obstacles have been defined using half 
         plane method
         Input: point/testCase(tuple)
@@ -51,10 +51,41 @@ def obstacleOrNot(point):
     else:
         return True
 
+def orignalobstacle(node):
+    """
+        Check whether the point is inside or outside the
+        defined obstacles. This is only used for plotting
+        Note: The obstacles have been defined using half 
+        plane method
+        Input: point/testCase(tuple)
+        Return: Boolean(True or False)
+    """
+    
+    x = node[0]
+    y = node[1]
+    #circle
+    if((x-90)**2 + (y-70)**2 - 35**2 < 0): #circle
+        return False
+    
+    # tilted Rectangle
+    elif((8604*x - 12287*y + 914004 < 0) and (81900*x +59350*y-25510527 < 0) and (86036*x - 122870*y + 12140167 > 0) and (8192*x + 5735*y - 1012596 > 0)):
+        return False
+    
+    # C shaped Polygon
+    elif((x >= 200 and x <= 210 and y <= 280 and y >=230 ) or (x>= 210 and x <= 230 and y >=270 and y <= 280) or (y >= 230 and y <= 240 and x >= 210 and x <= 230)):
+        return False
+    
+    # ellipse
+    elif((((x-246)/60))**2 + (((y-145)/30))**2 - 1 < 0):
+        return False
+    
+    else:
+        return True
+
 
 class A_Star:
     """
-    Class created to implement queue for Djikstra
+    Class created to implement queue for A star
     Maintains a list of nodes with another list
     maintaining the cost of each node.
     """
@@ -98,7 +129,7 @@ class A_Star:
     def insert(self, node, new_node):
         """
         Insert an element in the queue and also store its
-        cost incase the current cost is greater than new 
+        cost to come and cost incase the current cost is greater than new 
         cost
         Input: self, node(tuple), new_node(tuple), cost(float)
         Returns: None
@@ -142,7 +173,7 @@ class MovePoint:
     def __init__(self, startPoint, goalPoint, step_size, size):
         """
         Initialize the MovePoint object corresponding to a
-        start point, goal point, size of arena and the algorithm 
+        start point, goal point, step size, size of arena and the algorithm 
         to use.
         
         Input: startPoint(tuple), endPoint(tuple),
@@ -239,15 +270,16 @@ class MovePoint:
 
 def to_pygame(coords):
     """Convert coordinates into pygame coordinates (lower-left => top left)."""
-    return (coords[0], 300 - coords[1])
+    return (2*coords[0], 2*(300 - coords[1]))
 
 def triangle(gameDisplay,colour,start,end,angle):
-    # base = (int(end[0] + math.cos(-angle)),int(end[0] + math.sin(-angle)))
-    # pygame.draw.circle(gameDisplay, colour, to_pygame(base),2)
-    rotation = angle+90
-    t1 = to_pygame((end[0]+3*math.sin(math.radians(rotation)), end[1]+3*math.cos(math.radians(rotation))))
-    t2 = to_pygame((end[0]+3*math.sin(math.radians(rotation-120)), end[1]+3*math.cos(math.radians(rotation-120))))
-    t3 = to_pygame((end[0]+3*math.sin(math.radians(rotation+120)),end[1]+3*math.cos(math.radians(rotation+120))))
+    """
+    Draw a triangle at the point given the start and end points and the angle.
+    """
+    rotation = angle
+    t1 = to_pygame((end[0]+2*math.sin(math.radians(rotation)), end[1]+2*math.cos(math.radians(rotation))))
+    t2 = to_pygame((end[0]+2*math.sin(math.radians(rotation-120)), end[1]+2*math.cos(math.radians(rotation-120))))
+    t3 = to_pygame((end[0]+2*math.sin(math.radians(rotation+120)),end[1]+2*math.cos(math.radians(rotation+120))))
     pygame.draw.polygon(gameDisplay, colour, (t1, t2, t3))
 
 
@@ -322,34 +354,41 @@ def main():
     blue = (0,0,255,10)
 
 
-    gameDisplay = pygame.display.set_mode((400,300))
+    gameDisplay = pygame.display.set_mode((800,600))
     gameDisplay.fill(white)
-    rect_cl = [(46.77,101.02),(177.81,192.745),(160.615,217.33),(29.58,125.604)]
-    newCoords = [to_pygame(x) for x in rect_cl]
-    pygame.draw.polygon(gameDisplay, green, newCoords)
     
-    rect = [(48,108),(170.87,194.04),(159.40,210.42),(36.53,124.383)]
-    newCoords = [to_pygame(x) for x in rect]
-    pygame.draw.polygon(gameDisplay, red, newCoords)
+    for i in range(400):
+        for j in range(300):
+            if not orignalobstacle([i,j]):
+                pygame.draw.circle(gameDisplay, red, to_pygame((i,j)),1)
+            elif not obstacleOrNot([i,j]):
+                pygame.draw.circle(gameDisplay, green, to_pygame((i,j)),1)
+    # rect_cl = [(46.77,101.02),(177.81,192.745),(160.615,217.33),(29.58,125.604)]
+    # newCoords = [to_pygame(x) for x in rect_cl]
+    # pygame.draw.polygon(gameDisplay, green, newCoords)
+    
+    # rect = [(48,108),(170.87,194.04),(159.40,210.42),(36.53,124.383)]
+    # newCoords = [to_pygame(x) for x in rect]
+    # pygame.draw.polygon(gameDisplay, red, newCoords)
 
-    pygame.draw.circle(gameDisplay, green, to_pygame((90,70)),40)
-    pygame.draw.circle(gameDisplay, red, to_pygame((90,70)),35)
+    # pygame.draw.circle(gameDisplay, green, to_pygame((90,70)),40)
+    # pygame.draw.circle(gameDisplay, red, to_pygame((90,70)),35)
     
-    ellipseCenter = to_pygame((181,180))
-    ellipse = (ellipseCenter[0],ellipseCenter[1],130,70)
-    pygame.draw.ellipse(gameDisplay, green, ellipse)
+    # ellipseCenter = to_pygame((181,180))
+    # ellipse = (ellipseCenter[0],ellipseCenter[1],130,70)
+    # pygame.draw.ellipse(gameDisplay, green, ellipse)
     
-    ellipseCenter = to_pygame((186,175))
-    ellipse_cl = (ellipseCenter[0],ellipseCenter[1],120,60)
-    pygame.draw.ellipse(gameDisplay, red, ellipse_cl)
+    # ellipseCenter = to_pygame((186,175))
+    # ellipse_cl = (ellipseCenter[0],ellipseCenter[1],120,60)
+    # pygame.draw.ellipse(gameDisplay, red, ellipse_cl)
 
-    polygon = [(195,225),(235,225),(235,245),(215,245),(215,265),(235,265),(235,285),(195,285)]
-    newPolygon = [to_pygame(x) for x in polygon]
-    pygame.draw.polygon(gameDisplay, green, newPolygon)
+    # polygon = [(195,225),(235,225),(235,245),(215,245),(215,265),(235,265),(235,285),(195,285)]
+    # newPolygon = [to_pygame(x) for x in polygon]
+    # pygame.draw.polygon(gameDisplay, green, newPolygon)
     
-    polygon = [(200,230),(230,230),(230,240),(210,240),(210,270),(230,270),(230,280),(200,280)]
-    newPolygon = [to_pygame(x) for x in polygon]
-    pygame.draw.polygon(gameDisplay, red, newPolygon)
+    # polygon = [(200,230),(230,230),(230,240),(210,240),(210,270),(230,270),(230,280),(200,280)]
+    # newPolygon = [to_pygame(x) for x in polygon]
+    # pygame.draw.polygon(gameDisplay, red, newPolygon)
 
     clock = pygame.time.Clock()
     
@@ -364,9 +403,9 @@ def main():
             pygame.display.update()
         backTraceArr = backTraceArr[::-1]
         for point in range(len(backTraceArr)-1):
-            pygame.draw.line(gameDisplay, black, to_pygame(backTraceArr[point]),to_pygame(backTraceArr[point+1]))
+            pygame.draw.line(gameDisplay, black, to_pygame(backTraceArr[point]),to_pygame(backTraceArr[point+1]),width=2)
             triangle(gameDisplay,black,backTraceArr[point],backTraceArr[point+1],theta[backTraceArr[point]])
-            clock.tick(10000000)
+            clock.tick(1000000)
             pygame.display.update()
         
         time.sleep(10)
