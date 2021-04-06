@@ -170,7 +170,7 @@ class MovePoint:
     point.
     """
 
-    def __init__(self, startPoint, goalPoint, step_size, size):
+    def __init__(self, startPoint, goalPoint, step_size, size, theta):
         """
         Initialize the MovePoint object corresponding to a
         start point, goal point, step size, size of arena and the algorithm 
@@ -188,7 +188,7 @@ class MovePoint:
         self.size = size
         self.visited = {startPoint:0}
 
-        self.theta = {startPoint:0} 
+        self.theta = {startPoint:np.radians(theta)} 
 
     def nodeOperation(self, node, theta):
         """
@@ -300,6 +300,7 @@ def main():
     y2 = int(input("Enter the y coordinate of the goal point: "))
 
     step_size = int(input("Enter the step size for movement between 1 and 10: "))
+    theta = int(input("Enter the theta of the start point: "))
     print("\n")
     
     start = time.time()
@@ -331,7 +332,7 @@ def main():
 
     
 
-    move = MovePoint(startPoint,endPoint,step_size,arenaSize)  
+    move = MovePoint(startPoint,endPoint,step_size,arenaSize,theta)  
     flag = False
     while(not flag):
         flag = move.pointProcessor()
