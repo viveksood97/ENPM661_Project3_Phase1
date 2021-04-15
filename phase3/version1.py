@@ -4,18 +4,18 @@ import math
 import numpy as np
 from matplotlib import pyplot as plt
 
-def obstacleOrNot(point):
+def obstacleOrNot(point, clearance = 5):
     """
         Check whether the point is inside or outside the
         defined obstacles and clearance.
-        Note: The obstacles have been defined using half
+        Note: The obstacles have been defined using half 
         plane method
         Input: point/testCase(tuple)
         Return: Boolean(True or False)
     """
     x = point[0]
     y = point[1]
-
+    
     # l1 = y - 0.7*x - 74.4
     l1 = y - 0.7*x - 56.09
     # l2 = y + 1.43*x - 176.64
@@ -24,58 +24,28 @@ def obstacleOrNot(point):
     l3 = y - 0.7*x - 117.11
     # l4 = y + 1.43*x - 438.37
     l4 = y + 1.43*x - 474.82
-
-    if (x < 0) or (x > 400) or (y < 0) or (y > 300):
-        return False
-
-    # circle
-    elif((x-90)**2 + (y-70)**2 - 50**2 < 0):
-        return False
-
-    # tilted Rectangle
-    # elif((8604*x - 12287*y + 914004 < 0) and (81900*x +59350*y-25510527 < 0) and (86036*x - 122870*y + 12140167 > 0) and (8192*x + 5735*y - 1012596 > 0)):
-    #     return False
-
-    elif l1 > 0 and l2 > 0 and l3 < 0 and l4 < 0:
+    
+    if (x<0) or (x>1000) or (y<0) or (y>1000):
         return False
     
-    # C shaped Polygon
-    elif((x >= 185 and x <= 225 and y <= 295 and y >=215 ) or (x>= 225 and x <= 245 and y >=255 and y <= 295) or (y >= 215 and y <= 255 and x >= 225 and x <= 245)):
+    # circle1
+    elif((x-200)**2 + (y-200)**2 - (100 + clearance)**2 < 0): #circle
         return False
     
-    # ellipse
-    elif((((x-246)/75))**2 + (((y-145)/45))**2 - 1 < 0):
+    # circle2
+    elif((x-200)**2 + (y-800)**2 - (100 + clearance)**2 < 0): #circle
         return False
     
-    else:
-        return True
-
-def orignalobstacle(node):
-    """
-        Check whether the point is inside or outside the
-        defined obstacles. This is only used for plotting
-        Note: The obstacles have been defined using half 
-        plane method
-        Input: point/testCase(tuple)
-        Return: Boolean(True or False)
-    """
-    
-    x = node[0]
-    y = node[1]
-    #circle
-    if((x-90)**2 + (y-70)**2 - 35**2 < 0): #circle
+    # Square
+    elif(((x-25+clearance>0) and (x-175-clearance<0)) and ((y-425+clearance>0) and (y-575-clearance<0))):
         return False
     
-    # tilted Rectangle
-    elif((8604*x - 12287*y + 914004 < 0) and (81900*x +59350*y-25510527 < 0) and (86036*x - 122870*y + 12140167 > 0) and (8192*x + 5735*y - 1012596 > 0)):
+    # Horizontal Rectangle
+    elif(((x-375+clearance>0) and (x-625-clearance<0)) and ((y-425+clearance>0) and (y-575-clearance<0))):
         return False
     
-    # C shaped Polygon
-    elif((x >= 200 and x <= 210 and y <= 280 and y >=230 ) or (x>= 210 and x <= 230 and y >=270 and y <= 280) or (y >= 230 and y <= 240 and x >= 210 and x <= 230)):
-        return False
-    
-    # ellipse
-    elif((((x-246)/60))**2 + (((y-145)/30))**2 - 1 < 0):
+    # Vertical Rectangle
+    elif(((x-725+clearance>0) and (x-875-clearance<0)) and ((y-200+clearance>0) and (y-400-clearance<0))):
         return False
     
     else:
@@ -192,8 +162,10 @@ class MovePoint:
     def cost(self, node, Thetai, action):
 
         t = 0
-        r = 0.038
-        L = 0.354
+        # r = 0.038
+        # L = 0.354
+        r = 3.8
+        L = 35.4
         dt = 0.1
         Xn= node[0]
         Yn= node[1]
@@ -251,7 +223,7 @@ class MovePoint:
 
         print(node)
 
-        if(queue.euclideanDistance(node)<1.5):
+        if(queue.euclideanDistance(node)<15):
             if (goalPoint != node):
                 self.queue.child_parent_rel[goalPoint] = [node,0]
             return True
@@ -288,7 +260,7 @@ class MovePoint:
 
 def to_pygame(coords):
     """Convert coordinates into pygame coordinates (lower-left => top left)."""
-    return (2*coords[0], 2*(300 - coords[1]))
+    return (coords[0], 1000 - coords[1])
 
 def triangle(gameDisplay,colour,start,end,angle):
     """
@@ -324,7 +296,7 @@ def main():
     start = time.time()
     startPoint = (x1,y1)
     endPoint = (x2,y2)
-    arenaSize = (400,300)
+    arenaSize = (1000,1000)
 
     if((not obstacleOrNot(startPoint)) or (startPoint[0] > arenaSize[0]) or (startPoint[1] > arenaSize[1])):
         outStr = "Error: Start Point either on/inside obstacle or outside specified arena"
@@ -373,12 +345,12 @@ def main():
     blue = (0,0,255,10)
 
 
-    gameDisplay = pygame.display.set_mode((800,600))
+    gameDisplay = pygame.display.set_mode((1000,1000))
     gameDisplay.fill(white)
     
-    for i in range(400):
-        for j in range(300):
-            if not orignalobstacle([i,j]):
+    for i in range(1000):
+        for j in range(1000):
+            if not obstacleOrNot([i,j],0):
                 pygame.draw.circle(gameDisplay, red, to_pygame((i,j)),1)
             elif not obstacleOrNot([i,j]):
                 pygame.draw.circle(gameDisplay, green, to_pygame((i,j)),1)
