@@ -59,7 +59,7 @@ class A_Star:
     maintaining the cost of each node.
     """
 
-    def __init__(self, node, goalPoint, step_size):
+    def __init__(self, node, goalPoint):
         """
         Initialize a A_Star object corresponding to a
         start point.
@@ -68,7 +68,7 @@ class A_Star:
         """
 
         self.goalPoint = goalPoint
-        self.step_size = step_size
+        self.step_size = 0
 
         self.queue = [node]
 
@@ -124,9 +124,10 @@ class A_Star:
         """
         key_of_minimum_cost = min(self.cost, key=self.cost.get)
         #print(self.queue)
-        #print(self.cost[key_of_minimum_cost],key_of_minimum_cost)
+        #print(self.cost[key_of_minimum_cost],key_of_minimum_cost,self.cost_to_come[key_of_minimum_cost])
         self.cost.pop(key_of_minimum_cost)
         self.queue.remove(key_of_minimum_cost)
+
         
         return key_of_minimum_cost
 
@@ -138,7 +139,7 @@ class MovePoint:
     point.
     """
 
-    def __init__(self, startPoint, goalPoint, step_size, size, theta):
+    def __init__(self, startPoint, goalPoint, size, theta):
         """
         Initialize the MovePoint object corresponding to a
         start point, goal point, step size, size of arena and the algorithm 
@@ -149,9 +150,8 @@ class MovePoint:
         Return: None
         """
         self.goalPoint = goalPoint
-        self.step_size = step_size
 
-        self.queue = A_Star(startPoint,goalPoint,step_size)
+        self.queue = A_Star(startPoint,goalPoint)
 
         self.size = size
         self.visited = {startPoint:0}
@@ -169,7 +169,8 @@ class MovePoint:
         dt = 0.1
         Xn= node[0]
         Yn= node[1]
-        Thetan = math.pi * Thetai / 180
+        
+        Thetan = Thetai
 
         D=0
         while t<1:
@@ -179,9 +180,10 @@ class MovePoint:
             Xn += Delta_Xn
             Yn += Delta_Yn
             Thetan += (r / L) * (action[1] - action[0]) * dt
-            D=D+ math.sqrt(math.pow((0.5*r * (action[0] + action[1]) * math.cos(Thetan) * dt),2)+math.pow((0.5*r * (action[0] + action[1]) * math.sin(Thetan) * dt),2))
-        Thetan = 180 * (Thetan) / math.pi
-        return (Xn, Yn), Thetan, D
+            #D += math.sqrt(math.pow((0.5*r * (action[0] + action[1]) * math.cos(Thetan) * dt),2)+math.pow((0.5*r * (action[0] + action[1]) * math.sin(Thetan) * dt),2))
+        D = math.sqrt(math.pow((Xn - node[0]),2)+math.pow((Yn - node[1]),2))
+        
+        return (int(Xn), int(Yn)), Thetan, D
 
     def nodeOperation(self, node, theta, action):
         """
@@ -193,11 +195,10 @@ class MovePoint:
         """
         
         newNode = False
-        step_size = self.step_size
 
         if(obstacleOrNot(node)):
-            newNode, new_theta, _= self.cost(node, theta, action)
-
+            newNode, new_theta, new_step_size= self.cost(node, theta, action)
+            self.queue.step_size = new_step_size
         
         if(newNode and obstacleOrNot(newNode) and newNode not in self.visited):
             self.visited[newNode] = 0
@@ -221,15 +222,13 @@ class MovePoint:
         
         node= queue.extract()
 
-        print(node)
-
         if(queue.euclideanDistance(node)<15):
             if (goalPoint != node):
                 self.queue.child_parent_rel[goalPoint] = [node,0]
             return True
 
 
-        operationParams = [[5,5], [10,10],[5,0],[0,5],[5,10],[10,5]]
+        operationParams = [[15,15], [20,20],[15,0],[0,15],[15,20],[20,15]]
 
         # print("#######"+str(node))
         for action in operationParams:
@@ -289,7 +288,8 @@ def main():
     x2 = int(input("Enter the x coordinate of the goal point: "))
     y2 = int(input("Enter the y coordinate of the goal point: "))
 
-    step_size = int(input("Enter the step size for movement between 1 and 10: "))
+    
+
     theta = int(input("Enter the theta of the start point: "))
     print("\n")
     
@@ -312,17 +312,12 @@ def main():
         print("#"*len(outStr))
         print("\n")
         return False
-    if((0>step_size) or (step_size>10)):
-        outStr = "Error: Incorrect step size."
-        print("#"*len(outStr))
-        print("\n"+outStr+"\n")
-        print("#"*len(outStr))
-        print("\n")
-        return False
 
     
 
-    move = MovePoint(startPoint,endPoint,step_size,arenaSize,theta)  
+    
+
+    move = MovePoint(startPoint,endPoint,arenaSize,theta)  
     flag = False
     while(not flag):
         flag = move.pointProcessor()
@@ -401,15 +396,7 @@ def main():
         
         time.sleep(10)
         pygame.quit()
+        quit()
 
 if __name__ == '__main__':
-    # xpts = []
-    # ypts = []
-    # for x in range(500):
-    #         for y in range(400):
-    #             if not (obstacleOrNot((x,y))):
-    #                 xpts.append(x)
-    #                 ypts.append(y)
-    # plt.scatter(xpts,ypts,s=0.1)
-    # plt.show()
     main()
