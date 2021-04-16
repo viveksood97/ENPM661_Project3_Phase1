@@ -2,7 +2,9 @@ import pygame
 import time
 import math
 import numpy as np
+import cv2
 from matplotlib import pyplot as plt
+import matplotlib.animation as animation
 
 def obstacleOrNot(point, radius = 22, clearance = 5):
     """
@@ -171,8 +173,10 @@ class MovePoint:
             Xn += Delta_Xn
             Yn += Delta_Yn
             Thetan += (r / L) * (action[1] - action[0]) * dt
-            #D += math.sqrt(math.pow((0.5*r * (action[0] + action[1]) * math.cos(Thetan) * dt),2)+math.pow((0.5*r * (action[0] + action[1]) * math.sin(Thetan) * dt),2))
-        D = math.sqrt(math.pow((Xn - node[0]),2)+math.pow((Yn - node[1]),2))
+            if not obstacleOrNot((Xn,Yn)):
+                return node, Thetai, 0
+            D += math.sqrt(math.pow((0.5*r * (action[0] + action[1]) * math.cos(Thetan) * dt),2)+math.pow((0.5*r * (action[0] + action[1]) * math.sin(Thetan) * dt),2))
+        # D = math.sqrt(math.pow((Xn - node[0]),2)+math.pow((Yn - node[1]),2))
         
         return (int(Xn), int(Yn)), Thetan, D
 
@@ -191,7 +195,7 @@ class MovePoint:
             newNode, new_theta, new_step_size= self.cost(node, theta, action)
             self.queue.step_size = new_step_size
         
-        if(newNode and obstacleOrNot(newNode) and newNode not in self.visited):
+        if(newNode and newNode not in self.visited and obstacleOrNot(newNode)):
             self.visited[newNode] = 0
             self.theta[newNode] = new_theta
             self.queue.insert(node, newNode)
@@ -261,6 +265,31 @@ def triangle(gameDisplay,colour,start,end,angle):
     t2 = to_pygame((end[0]+2*math.sin(math.radians(rotation-120)), end[1]+2*math.cos(math.radians(rotation-120))))
     t3 = to_pygame((end[0]+2*math.sin(math.radians(rotation+120)),end[1]+2*math.cos(math.radians(rotation+120))))
     pygame.draw.polygon(gameDisplay, colour, (t1, t2, t3))
+    
+def plot_curve(node, Thetai, action, f_map):
+    
+        t = 0
+        r = 3.8
+        L = 35.4
+        dt = 0.1
+        Xn= node[0]
+        Yn= node[1]
+        
+        Thetan = Thetai
+
+        D=0
+        while t<1:
+            t = t + dt
+            Delta_Xn = int(0.5*r * (action[0] + action[1]) * math.cos(Thetan) * dt)
+            Delta_Yn = int(0.5*r * (action[0] + action[1]) * math.sin(Thetan) * dt)
+            f_map = cv2.line(f_map,(Xn,Yn),(Xn + Delta_Xn,Yn + Delta_Yn),(255,0,00), thickness = 2)
+            Xn += Delta_Xn
+            Yn += Delta_Yn
+            Thetan += (r / L) * (action[1] - action[0]) * dt
+            #D += math.sqrt(math.pow((0.5*r * (action[0] + action[1]) * math.cos(Thetan) * dt),2)+math.pow((0.5*r * (action[0] + action[1]) * math.sin(Thetan) * dt),2))
+        D = math.sqrt(math.pow((Xn - node[0]),2)+math.pow((Yn - node[1]),2))
+        
+        return f_map
 
 
 def main():
@@ -318,76 +347,35 @@ def main():
     finalOut = f"\nPath found in {round(end - start, 4)} seconds.\n"
     print(finalOut)
     
-    pygame.init()
-
-    pygame.display.set_caption("Path Planner")
-
-    white = (255,255,255)
-    black = (0,0,0)
-    
-    yellow = (255,255,0)
-    red = (255,0,0)
-    green = (0,255,0)
-    blue = (0,0,255,10)
-
-
-    gameDisplay = pygame.display.set_mode((1000,1000))
-    gameDisplay.fill(white)
-    
+    f_map = np.zeros(shape = (1000,1000,3))
     for i in range(1000):
         for j in range(1000):
-            if not obstacleOrNot([i,j],0):
-                pygame.draw.circle(gameDisplay, red, to_pygame((i,j)),1)
-            elif not obstacleOrNot([i,j]):
-                pygame.draw.circle(gameDisplay, green, to_pygame((i,j)),1)
-    # rect_cl = [(46.77,101.02),(177.81,192.745),(160.615,217.33),(29.58,125.604)]
-    # newCoords = [to_pygame(x) for x in rect_cl]
-    # pygame.draw.polygon(gameDisplay, green, newCoords)
+            if not obstacleOrNot([i,j]):
+                f_map[j][i] = [255,255,0]
     
-    # rect = [(48,108),(170.87,194.04),(159.40,210.42),(36.53,124.383)]
-    # newCoords = [to_pygame(x) for x in rect]
-    # pygame.draw.polygon(gameDisplay, red, newCoords)
-
-    # pygame.draw.circle(gameDisplay, green, to_pygame((90,70)),40)
-    # pygame.draw.circle(gameDisplay, red, to_pygame((90,70)),35)
+    fig = plt.figure()
+    im = plt.imshow(f_map.astype('uint8'), origin='lower', animated=True)
+    ims = []
+    actions = [[15,15], [20,20],[15,0],[0,15],[15,20],[20,15]]
     
-    # ellipseCenter = to_pygame((181,180))
-    # ellipse = (ellipseCenter[0],ellipseCenter[1],130,70)
-    # pygame.draw.ellipse(gameDisplay, green, ellipse)
+    backTraceArr = backTraceArr[::-1]
     
-    # ellipseCenter = to_pygame((186,175))
-    # ellipse_cl = (ellipseCenter[0],ellipseCenter[1],120,60)
-    # pygame.draw.ellipse(gameDisplay, red, ellipse_cl)
-
-    # polygon = [(195,225),(235,225),(235,245),(215,245),(215,265),(235,265),(235,285),(195,285)]
-    # newPolygon = [to_pygame(x) for x in polygon]
-    # pygame.draw.polygon(gameDisplay, green, newPolygon)
-    
-    # polygon = [(200,230),(230,230),(230,240),(210,240),(210,270),(230,270),(230,280),(200,280)]
-    # newPolygon = [to_pygame(x) for x in polygon]
-    # pygame.draw.polygon(gameDisplay, red, newPolygon)
-
-    clock = pygame.time.Clock()
-    
-    while True:
-        pygame.event.get()
+    # for key in move.visited.keys():
+    #     for action in actions:
+    #         f_map = plot_curve(key,theta[key],action,f_map)
         
-        pygame.draw.circle(gameDisplay, black, to_pygame(endPoint),2)
-        for key in move.visited.keys():
-            if child_parent_rel[key][0]:
-                pygame.draw.line(gameDisplay,blue,to_pygame(key),to_pygame(child_parent_rel[key][0]))
-            clock.tick(10000000)
-            pygame.display.update()
-        backTraceArr = backTraceArr[::-1]
-        for point in range(len(backTraceArr)-1):
-            pygame.draw.line(gameDisplay, black, to_pygame(backTraceArr[point]),to_pygame(backTraceArr[point+1]),width=2)
-            triangle(gameDisplay,black,backTraceArr[point],backTraceArr[point+1],theta[backTraceArr[point]])
-            clock.tick(1000000)
-            pygame.display.update()
-        
-        time.sleep(10)
-        pygame.quit()
-        quit()
+    #     im = plt.imshow(f_map.astype('uint8'),origin='lower')
+    #     ims.append([im])
+    
+    for i in range(len(backTraceArr)):
+        for action in actions:
+            f_map = plot_curve(backTraceArr[i],theta[backTraceArr[i]],action,f_map)
+
+        im = plt.imshow(f_map.astype('uint8'),origin='lower')
+        ims.append([im])
+    
+    ani = animation.ArtistAnimation(fig, ims, interval=100, blit=False)
+    plt.show()
 
 if __name__ == '__main__':
     main()
