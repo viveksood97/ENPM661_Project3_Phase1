@@ -16,15 +16,6 @@ def obstacleOrNot(point, clearance = 5):
     x = point[0]
     y = point[1]
     
-    # l1 = y - 0.7*x - 74.4
-    l1 = y - 0.7*x - 56.09
-    # l2 = y + 1.43*x - 176.64
-    l2 = y + 1.43*x - 140.19
-    # l3 = y - 0.7*x - 98.8
-    l3 = y - 0.7*x - 117.11
-    # l4 = y + 1.43*x - 438.37
-    l4 = y + 1.43*x - 474.82
-    
     if (x<0) or (x>1000) or (y<0) or (y>1000):
         return False
     
