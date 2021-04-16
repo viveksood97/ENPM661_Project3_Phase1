@@ -4,7 +4,7 @@ import math
 import numpy as np
 from matplotlib import pyplot as plt
 
-def obstacleOrNot(point, clearance = 5):
+def obstacleOrNot(point, radius = 22, clearance = 5):
     """
         Check whether the point is inside or outside the
         defined obstacles and clearance.
@@ -20,23 +20,23 @@ def obstacleOrNot(point, clearance = 5):
         return False
     
     # circle1
-    elif((x-200)**2 + (y-200)**2 - (100 + clearance)**2 < 0): #circle
+    elif((x-200)**2 + (y-200)**2 - (100 + clearance + radius)**2 < 0): #circle
         return False
     
     # circle2
-    elif((x-200)**2 + (y-800)**2 - (100 + clearance)**2 < 0): #circle
+    elif((x-200)**2 + (y-800)**2 - (100 + clearance + radius)**2 < 0): #circle
         return False
     
     # Square
-    elif(((x-25+clearance>0) and (x-175-clearance<0)) and ((y-425+clearance>0) and (y-575-clearance<0))):
+    elif(((x - 25 + clearance + radius > 0) and (x - 175 - clearance - radius < 0)) and ((y - 425 + clearance + radius > 0) and (y - 575 - clearance - radius < 0))):
         return False
     
     # Horizontal Rectangle
-    elif(((x-375+clearance>0) and (x-625-clearance<0)) and ((y-425+clearance>0) and (y-575-clearance<0))):
+    elif(((x - 375 + clearance + radius > 0) and (x - 625 - clearance - radius < 0)) and ((y - 425 + clearance + radius > 0) and (y - 575 - clearance - radius < 0))):
         return False
     
     # Vertical Rectangle
-    elif(((x-725+clearance>0) and (x-875-clearance<0)) and ((y-200+clearance>0) and (y-400-clearance<0))):
+    elif(((x - 725 + clearance + radius > 0) and (x - 875 - clearance - radius < 0)) and ((y - 200 + clearance + radius > 0) and (y - 400 - clearance - radius < 0))):
         return False
     
     else:
