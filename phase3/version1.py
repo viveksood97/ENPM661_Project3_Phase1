@@ -1,10 +1,10 @@
-import pygame
 import time
 import math
 import numpy as np
 import cv2
 from matplotlib import pyplot as plt
 import matplotlib.animation as animation
+
 
 def obstacleOrNot(point, radius = 22, clearance = 5):
     """
@@ -167,16 +167,18 @@ class MovePoint:
 
         D=0
         while t<1:
-            t = t + dt
-            Delta_Xn = 0.5*r * (action[0] + action[1]) * math.cos(Thetan) * dt
-            Delta_Yn = 0.5*r * (action[0] + action[1]) * math.sin(Thetan) * dt
+            t += dt
+            temp = 0.5*r * (action[0] + action[1]) * dt
+            cos = math.cos(Thetan)
+            sin = math.sin(Thetan)
+            Delta_Xn = cos * temp
+            Delta_Yn = sin * temp
             Xn += Delta_Xn
             Yn += Delta_Yn
             Thetan += (r / L) * (action[1] - action[0]) * dt
             if not obstacleOrNot((Xn,Yn)):
                 return node, Thetai, 0
-            D += math.sqrt(math.pow((0.5*r * (action[0] + action[1]) * math.cos(Thetan) * dt),2)+math.pow((0.5*r * (action[0] + action[1]) * math.sin(Thetan) * dt),2))
-        # D = math.sqrt(math.pow((Xn - node[0]),2)+math.pow((Yn - node[1]),2))
+            D += math.sqrt(math.pow(Delta_Xn,2)+math.pow(Delta_Yn,2))
         
         return (int(Xn), int(Yn)), Thetan, D
 
@@ -192,10 +194,11 @@ class MovePoint:
         newNode = False
 
         if(obstacleOrNot(node)):
-            newNode, new_theta, new_step_size= self.cost(node, theta, action)
-            self.queue.step_size = new_step_size
+            newNode, new_theta, new_step_size = self.cost(node, theta, action)
+                
         
         if(newNode and newNode not in self.visited and obstacleOrNot(newNode)):
+            self.queue.step_size = new_step_size
             self.visited[newNode] = 0
             self.theta[newNode] = new_theta
             self.queue.insert(node, newNode)
