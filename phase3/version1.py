@@ -269,7 +269,7 @@ def triangle(gameDisplay,colour,start,end,angle):
     t3 = to_pygame((end[0]+2*math.sin(math.radians(rotation+120)),end[1]+2*math.cos(math.radians(rotation+120))))
     pygame.draw.polygon(gameDisplay, colour, (t1, t2, t3))
     
-def plot_curve(node, Thetai, action, f_map):
+def plot_curve(node, Thetai, action, f_map, color):
     
         t = 0
         r = 3.8
@@ -285,12 +285,11 @@ def plot_curve(node, Thetai, action, f_map):
             t = t + dt
             Delta_Xn = int(0.5*r * (action[0] + action[1]) * math.cos(Thetan) * dt)
             Delta_Yn = int(0.5*r * (action[0] + action[1]) * math.sin(Thetan) * dt)
-            f_map = cv2.line(f_map,(Xn,Yn),(Xn + Delta_Xn,Yn + Delta_Yn),(255,0,00), thickness = 2)
             Xn += Delta_Xn
             Yn += Delta_Yn
+            if obstacleOrNot((Xn,Yn)):
+                f_map = cv2.line(f_map,(Xn,Yn),(Xn + Delta_Xn,Yn + Delta_Yn),color, thickness = 2)
             Thetan += (r / L) * (action[1] - action[0]) * dt
-            #D += math.sqrt(math.pow((0.5*r * (action[0] + action[1]) * math.cos(Thetan) * dt),2)+math.pow((0.5*r * (action[0] + action[1]) * math.sin(Thetan) * dt),2))
-        D = math.sqrt(math.pow((Xn - node[0]),2)+math.pow((Yn - node[1]),2))
         
         return f_map
 
@@ -363,16 +362,21 @@ def main():
     
     backTraceArr = backTraceArr[::-1]
     
-    # for key in move.visited.keys():
-    #     for action in actions:
-    #         f_map = plot_curve(key,theta[key],action,f_map)
-        
-    #     im = plt.imshow(f_map.astype('uint8'),origin='lower')
-    #     ims.append([im])
+    res = 0
+    for key in move.visited.keys():
+        if res%200 != 0 :
+            res = res + 1
+            for action in actions:
+                f_map = plot_curve(key,theta[key],action,f_map,(255,255,255))
+        else:
+            res = res + 1
+            im = plt.imshow(f_map.astype('uint8'),origin='lower')
+            ims.append([im])
+            
     
     for i in range(len(backTraceArr)):
         for action in actions:
-            f_map = plot_curve(backTraceArr[i],theta[backTraceArr[i]],action,f_map)
+            f_map = plot_curve(backTraceArr[i],theta[backTraceArr[i]],action,f_map,(255,0,00))
 
         im = plt.imshow(f_map.astype('uint8'),origin='lower')
         ims.append([im])
