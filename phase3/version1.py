@@ -352,8 +352,14 @@ def main():
     f_map = np.zeros(shape = (1000,1000,3))
     for i in range(1000):
         for j in range(1000):
-            if not obstacleOrNot([i,j]):
+            if not obstacleOrNot([i,j],radius=0,clearance = 0):
+                f_map[j][i] = [0,102,51]
+            elif not obstacleOrNot([i,j],radius = 0):
                 f_map[j][i] = [255,255,0]
+            elif not obstacleOrNot([i,j]):
+                f_map[j][i] = [0,0,255]
+            else:
+                f_map[j][i] = [255,255,255]
     
     fig = plt.figure()
     im = plt.imshow(f_map.astype('uint8'), origin='lower', animated=True)
@@ -367,7 +373,7 @@ def main():
         if res%200 != 0 :
             res = res + 1
             for action in actions:
-                f_map = plot_curve(key,theta[key],action,f_map,(255,255,255))
+                f_map = plot_curve(key,theta[key],action,f_map,(128,128,128))
         else:
             res = res + 1
             im = plt.imshow(f_map.astype('uint8'),origin='lower')
