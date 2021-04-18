@@ -226,7 +226,7 @@ class MovePoint:
             return True
 
 
-        operationParams = [[15,15], [20,20],[15,0],[0,15],[15,20],[20,15]]
+        operationParams = [[15,15],[15,0],[0,15],[15,20],[20,15],[20,20],[0,20],[20,0]] 
 
         # print("#######"+str(node))
         for action in operationParams:
@@ -364,7 +364,7 @@ def main():
     fig = plt.figure()
     im = plt.imshow(f_map.astype('uint8'), origin='lower', animated=True)
     ims = []
-    actions = [[15,15], [20,20],[15,0],[0,15],[15,20],[20,15]]
+    actions = [[15,15],[15,0],[0,15],[15,20],[20,15],[20,20],[0,20],[20,0]]
     
     backTraceArr = backTraceArr[::-1]
     
