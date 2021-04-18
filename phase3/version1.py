@@ -255,19 +255,6 @@ class MovePoint:
             backTraceArr.append(node)
         return backTraceArr, child_parent_relation, self.theta
 
-def to_pygame(coords):
-    """Convert coordinates into pygame coordinates (lower-left => top left)."""
-    return (coords[0], 1000 - coords[1])
-
-def triangle(gameDisplay,colour,start,end,angle):
-    """
-    Draw a triangle at the point given the start and end points and the angle.
-    """
-    rotation = angle
-    t1 = to_pygame((end[0]+2*math.sin(math.radians(rotation)), end[1]+2*math.cos(math.radians(rotation))))
-    t2 = to_pygame((end[0]+2*math.sin(math.radians(rotation-120)), end[1]+2*math.cos(math.radians(rotation-120))))
-    t3 = to_pygame((end[0]+2*math.sin(math.radians(rotation+120)),end[1]+2*math.cos(math.radians(rotation+120))))
-    pygame.draw.polygon(gameDisplay, colour, (t1, t2, t3))
     
 def plot_curve(node, Thetai, action, f_map, color):
     
