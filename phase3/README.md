@@ -40,6 +40,8 @@ Enter the y coordinate of the start point: 100
 Enter the x coordinate of the goal point: 900
 Enter the y coordinate of the goal point: 900
 Enter the theta of the start point: 0
+Enter RPM1: 15
+Enter RPM2: 20
 
 ```
 ##### Enter start and goal positions and the code will find a path and start the animation depicting the path.

@@ -132,7 +132,7 @@ class MovePoint:
     point.
     """
 
-    def __init__(self, startPoint, goalPoint, size, theta):
+    def __init__(self, startPoint, goalPoint, size, theta, actions):
         """
         Initialize the MovePoint object corresponding to a
         start point, goal point, step size, size of arena and the algorithm 
@@ -150,6 +150,7 @@ class MovePoint:
         self.visited = {startPoint:0}
 
         self.theta = {startPoint:np.radians(theta)}
+        self.actions = actions
 
 
     def cost(self, node, Thetai, action):
@@ -227,7 +228,7 @@ class MovePoint:
             return True
 
 
-        operationParams = [[15,15],[15,0],[0,15],[15,20],[20,15],[20,20],[0,20],[20,0]] 
+        operationParams = self.actions
 
         # print("#######"+str(node))
         for action in operationParams:
@@ -302,6 +303,11 @@ def main():
     
 
     theta = int(input("Enter the theta of the start point: "))
+    
+    rpm1 = int(input("Enter RPM1: "))
+    rpm2 = int(input("Enter RPM2: "))
+    
+    actions = [[0, rpm1],[rpm1, 0],[rpm1, rpm1],[0, rpm2],[rpm2, 0],[rpm2, rpm2],[rpm1, rpm2],[rpm2, rpm1]]
     print("\n")
     
     start = time.time()
@@ -328,7 +334,7 @@ def main():
 
     
 
-    move = MovePoint(startPoint,endPoint,arenaSize,theta)  
+    move = MovePoint(startPoint,endPoint,arenaSize,theta,actions)  
     flag = False
     while(not flag):
         flag = move.pointProcessor()
@@ -353,7 +359,7 @@ def main():
     fig = plt.figure()
     im = plt.imshow(f_map.astype('uint8'), origin='lower', animated=True)
     ims = []
-    actions = [[15,15],[15,0],[0,15],[15,20],[20,15],[20,20],[0,20],[20,0]]
+    # actions = [[15,15],[15,0],[0,15],[15,20],[20,15],[20,20],[0,20],[20,0]]
     
     backTraceArr = backTraceArr[::-1]
     # print(backTraceArr)
