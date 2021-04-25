@@ -46,5 +46,7 @@ Enter RPM2: 20 # recommended value
 ```
 ##### Enter start and goal positions and the code will find a path and start the animation depicting the path.
 
+To save the video uncomment line 387: ani.save('animation.mp4') 
+
 
 ### Part 2: A* algorithm: Simulation in Gazebo using ros
