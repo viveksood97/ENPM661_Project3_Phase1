@@ -10,10 +10,12 @@
 ##### 2. The algorithm that we have implemented for phase 1 is A* algorithm.
 ### Packages Used
 ```python
-import pygame
 import time
 import math
+import numpy as np
+import cv2
 from matplotlib import pyplot as plt
+import matplotlib.animation as animation
 ```
 ##### Note: Apart from pygame everything else is an inbuilt package
 ### Usage
@@ -24,8 +26,6 @@ python3 version1.py
 ##### This will generate a prompt.
 
 ```bash
-pygame 2.0.1 (SDL 2.0.14, Python 3.6.10)
-Hello from the pygame community. https://www.pygame.org/contribute.html
  
    ____        __  __       ____  __                           
    / __ \____ _/ /_/ /_     / __ \/ /___ _____  ____  ___  _____
