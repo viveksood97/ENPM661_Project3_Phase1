@@ -384,8 +384,8 @@ def main():
         ims.append([im])
     
     ani = animation.ArtistAnimation(fig, ims, interval=100, blit=False)
-    ani.save('animation.mp4')
-    # plt.show()
+    # ani.save('animation.mp4')
+    plt.show()
 
 if __name__ == '__main__':
     main()
