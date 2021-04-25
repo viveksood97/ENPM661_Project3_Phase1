@@ -223,6 +223,7 @@ class MovePoint:
         if(queue.euclideanDistance(node)<15):
             if (goalPoint != node):
                 self.queue.child_parent_rel[goalPoint] = [node,0]
+                self.theta[goalPoint] = self.theta[node]
             return True
 
 
@@ -248,6 +249,7 @@ class MovePoint:
         
         
         node =  child_parent_relation[goalPoint][0]
+        backTraceArr.append(goalPoint)
         while(node != startPoint):
             # print(child_parent_relation)
             # print(node)
@@ -354,6 +356,7 @@ def main():
     actions = [[15,15],[15,0],[0,15],[15,20],[20,15],[20,20],[0,20],[20,0]]
     
     backTraceArr = backTraceArr[::-1]
+    # print(backTraceArr)
     
     res = 0
     for key in move.visited.keys():
@@ -375,7 +378,8 @@ def main():
         ims.append([im])
     
     ani = animation.ArtistAnimation(fig, ims, interval=100, blit=False)
-    plt.show()
+    ani.save('animation.mp4')
+    # plt.show()
 
 if __name__ == '__main__':
     main()
